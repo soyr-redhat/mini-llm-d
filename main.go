@@ -36,7 +36,7 @@ func determineBackend(reqPayload ChatCompletionRequest) string {
 		totalChars += len(msg.Content)
 	}
 
-	fmt.Printf("Model=%s, Total Chars=%d", reqPayload.Model.Model, totalChars)
+	fmt.Printf("Model=%s, Total Chars=%d", reqPayload.Model, totalChars)
 
 	// simulation for kv-cache aware routing -> if len prompt > 100 chars, send to hi cap pod
 	if totalChars > 100 {
