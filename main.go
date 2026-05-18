@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -79,5 +80,11 @@ func handleLLMTraffic(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// bind the handler to the standar vLLM endpoint
+	http.HandleFunc("v1/chat/completions", handleLLMTraffic)
+	port := ":8080"
+	fmt.Printf("mini-router is running on port %s\n", port)
 
+	// start the webserver, wrapping it in log.fatal should catch the crash
+	log.Fatal(http.ListenAndServe(port, nil))
 }
