@@ -1,7 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
 )
 
 type ChatMessage struct {
@@ -39,4 +44,40 @@ func determineBackend(reqPayload ChatCompletionRequest) string {
 	}
 	fmt.Println("Low-Capacity workload detected, routing to SmallModelPod")
 	return SmallModelPod
+}
+
+/*
+If for some reason, there was an error reading the request, the user should be informed
+*/
+func handleLLMTraffic(w http.ResponseWriter, r *http.Request) {
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failure, request body was not read.", http.StatusBadRequest)
+		return
+	}
+
+	r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	var llmReq ChatCompletionRequest
+	targetBackend := determineBackend(llmReq)
+
+	targetURL, err := url.Parse(targetBackend)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	// handle http requests
+	proxy := httputil.NewSingleHostReverseProxy(targetURL)
+
+	r.URL.Host = targetURL.Host
+	r.URL.Scheme = targetURL.Scheme
+	r.Header.Set("X-Forwarded-Host", r.Header.Get("Host"))
+	r.Host = targetURL.Host
+
+	proxy.ServeHTTP(w, r)
+}
+
+func main() {
+
 }
