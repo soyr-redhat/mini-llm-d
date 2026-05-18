@@ -81,7 +81,7 @@ func handleLLMTraffic(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// bind the handler to the standar vLLM endpoint
-	http.HandleFunc("v1/chat/completions", handleLLMTraffic)
+	http.HandleFunc("/v1/chat/completions", handleLLMTraffic)
 	port := ":8080"
 	fmt.Printf("mini-router is running on port %s\n", port)
 
