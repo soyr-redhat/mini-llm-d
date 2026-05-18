@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -60,6 +61,10 @@ func handleLLMTraffic(w http.ResponseWriter, r *http.Request) {
 	r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 	var llmReq ChatCompletionRequest
+
+	if json.Unmarshal(bodyBytes, &llmReq); err != nil {
+		fmt.Println("Error parsing incoming JSON: ", err)
+	}
 	targetBackend := determineBackend(llmReq)
 
 	targetURL, err := url.Parse(targetBackend)
