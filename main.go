@@ -1,3 +1,12 @@
+/*
+The goal of this mini-project for me is to get used to the go syntax,
+some L7 capabilities, Such as:
+
+	HTTP,
+	reverse proxies (though there is still much to learn).
+
+Though request length aware routing to simulate how kv cache hit rate routing is done under the hood with llm-d on a larger scale.
+*/
 package main
 
 import (
